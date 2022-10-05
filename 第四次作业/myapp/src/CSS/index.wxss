@@ -1,0 +1,17 @@
+#app {
+  height: 100vh;
+  background-color: antiquewhite;
+}
+#contain {
+  display: flex;
+}
+#contain .side {
+  width: 200px;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+#contain .content {
+  flex: 1;
+  height: 100%;
+  background-color: #fff;
+}
