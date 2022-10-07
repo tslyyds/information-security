@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    #app {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        padding: 30px 50px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .contain {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        padding: 20px;
+        align-items: center;
+        justify-content: space-around;
+        background-color: aliceblue;
+    }
+    
+    .left,
+    .right {
+        width: 45%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: antiquewhite;
+    }
+    
+    .left_contain,
+    .right_contain {
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .header {
+        font-size: 30px;
+        font-weight: 800;
+    }
+    
+    textarea {
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        resize: none;
+    }
+    
+    input {
+        width: 100%;
+        height: 40px;
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+        outline: none;
+    }
+    
+    button {
+        margin-top: 30px;
+        width: 50%;
+        height: 40px;
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+        outline: none;
+        cursor: pointer;
+        font-weight: bold;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <div class="contain">
+            <div class="left">
+                <div class="header">Carsar加密算法</div>
+                <div class="left_contain">
+                    <div class="input">
+                        <div class="input-header">请输入明文</div>
+                        <div class="input-content">
+                            <textarea name="" id="jiamiInput" cols="30" rows="10"></textarea>
+                        </div>
+                    </div>
+                    <div class="key">
+                        <div class="key-header">请输入密钥</div>
+                        <div class="key-content">
+                            <input type="text" id="jiamiKey">
+                        </div>
+                    </div>
+                    <div class="button">
+                        <button id="encrypt">加密</button>
+                        <input id="jiamiResult"></input>
+                    </div>
+                </div>
+            </div>
+            <div class="right">
+                <div class="header">Carsar解密算法</div>
+                <div class="right_contain">
+                    <div class="input">
+                        <div class="input-title">输入密文</div>
+                        <div class="input-content">
+                            <textarea name="" id="jiemiInput" cols="30" rows="10"></textarea>
+                        </div>
+                    </div>
+                    <div class="key">
+                        <div class="key-title">输入密钥</div>
+                        <div class="key-content">
+                            <input type="text" id="jiemiKey">
+                        </div>
+                    </div>
+                    <div class="right_button">
+                        <button id="decrypt">解密</button>
+                        <input id="jiemiResult"></input>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    //加密
+    let encrypt = document.getElementById('encrypt');
+    encrypt.onclick = function() {
+            var secretKey, expressWords, secretWords;
+            expressWords = document.getElementById("jiamiInput").value;
+            secretKey = document.getElementById("jiamiKey").value;
+            //这里记得把拿到的密钥值从字符串类型转为Number类型
+            secretKeyNum = Number(secretKey);
+            console.log(expressWords, secretKeyNum);
+
+            var start1 = "A".charCodeAt(0);
+            var end1 = "Z".charCodeAt(0);
+            var start2 = "a".charCodeAt(0);
+            var end2 = "z".charCodeAt(0);
+
+            var strList = expressWords.split("");
+            var judge, replace;
+            for (var i = 0; i < expressWords.length; i++) {
+                judge = strList[i].charCodeAt(0);
+                if (judge <= end1 && judge >= start1) {
+                    replace = start1 + (judge - start1 + secretKeyNum) % 26;
+                    strList[i] = String.fromCharCode(replace);
+                } else if (judge <= end2 && judge >= start2) {
+                    replace = start2 + (judge - start2 + secretKeyNum) % 26;
+                    strList[i] = String.fromCharCode(replace);
+                }
+            }
+            secretWords = strList.join("");
+            document.getElementById('jiamiResult').value = secretWords
+        }
+        //解密
+    let decrypt = document.getElementById('decrypt');
+    decrypt.onclick = function() {
+        let input = document.getElementById('jiemiInput').value;
+        let key = document.getElementById('jiemiKey').value;
+        console.log(input, key);
+        let result = '';
+        for (let i = 0; i < input.length; i++) {
+            let char = input[i];
+            if (char.match(/[a-z]/i)) {
+                let code = input.charCodeAt(i);
+                if ((code >= 65) && (code <= 90)) {
+                    char = String.fromCharCode(((code - 65 - key) % 26) + 65);
+                } else if ((code >= 97) && (code <= 122)) {
+                    char = String.fromCharCode(((code - 97 - key) % 26) + 97);
+                }
+            }
+            result += char;
+        }
+        document.getElementById('jiemiResult').value = result;
+    }
+</script>
+
+</html>

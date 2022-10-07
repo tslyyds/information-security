@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    #app {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        padding: 30px 50px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .contain {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        align-items: center;
+        justify-content: space-around;
+        background-color: antiquewhite;
+    }
+    
+    .middle {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .left,
+    .right {
+        width: 45%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: antiquewhite;
+    }
+    
+    .header {
+        font-size: 30px;
+        font-weight: 800;
+    }
+    
+    .input {
+        margin: 10px 0;
+    }
+    
+    textarea {
+        height: 150px;
+        width: 300px;
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        font-size: 20px;
+        font-weight: 600;
+        resize: none;
+    }
+    
+    input {
+        width: 100%;
+        height: 40px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 0 10px;
+    }
+    
+    button {
+        width: 50%;
+        height: 40px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 0 10px;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <div class="contain">
+            <div class="header">Playfair算法</div>
+            <div class="middle">
+                <div class="input">
+                    <div class="input_header">请输入要加密/解密内容：</div>
+                    <div class="input_contain">
+                        <textarea name="" id="Input" cols="30" rows="10" placeholder="请输入明文"></textarea>
+                    </div>
+                </div>
+                <div class="key">
+                    <div class="key_header">输入密钥</div>
+                    <div class="key_contain">
+                        <input type="text" id="Key" placeholder="请输入密钥">
+                    </div>
+                </div>
+            </div>
+            <div class="button">
+                <div class="jiami">
+                    <button id="encrypt">加密</button>
+                    <input id="jiamiResult"></input>
+                </div>
+                <div class="jiemi">
+                    <button id="decrypt">解密</button>
+                    <input id="jiemiResult"></input>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script>
+    let encrypt = document.getElementById('encrypt')
+    let decrypt = document.getElementById('decrypt')
+    let Input = document.getElementById('Input')
+    let Key = document.getElementById('Key')
+    let jiamiResult = document.getElementById('jiamiResult')
+    let jiemiResult = document.getElementById('jiemiResult')
+
+    var position = [];
+    //创建密码表
+    function creat(key) {
+        var a = [5];
+        for (var temp = 0; temp < 5; temp++) a[temp] = [];
+        /*初始化矩阵完成*/
+        var words = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'];
+        for (var num in key) {
+            var x = parseInt(num / 5),
+                y = num % 5;
+            var w = key[num];
+            var po = w.charCodeAt() - 65;
+            position[po] = x + "," + y;
+            var p = words.indexOf(w);
+            words.splice(p, 1);
+            a[x][y] = w;
+        }
+        /**/
+        for (var num1 in words) {
+            var num2 = num1 * 1 + num * 1 + 1;
+            var x1 = parseInt(num2 / 5),
+                y1 = num2 % 5;
+            var po = words[num1].charCodeAt() - 65;
+            position[po] = x1 + "," + y1;
+            a[x1][y1] = words[num1];
+
+        }
+        return a;
+    }
+
+    //处理加密/解密内容
+    function contentValidate(str) {
+        str = str.replace(/\s|"|-/g, ""); //去空
+        str = str.toUpperCase(); //所有小写转成大写
+        var pattern = new RegExp("[`~!@#$^&*(-)=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？Z]", "g");
+        str = str.replace(pattern, ""); //去掉特殊字符及Z
+        console.log(str);
+        var arr = str.split("");
+        var temp, temp1;
+        var result = [];
+        for (i = 0; i < arr.length; i = i + 2) {
+            temp = arr[i].charCodeAt();
+            if (arr[i + 1])
+                temp1 = arr[i + 1].charCodeAt();
+            if (90 < temp || temp < 65 || 90 < temp1 || temp1 < 65)
+                return "";
+            if (arr[i] == arr[i + 1]) {
+                if (arr[i] != "K")
+                    result.push(arr[i], "K", arr[i + 1]);
+                else
+                    result.push(arr[i], "L", arr[i + 1]);
+            } else {
+                result.push(arr[i], arr[i + 1]);
+            }
+
+        }
+        return arr.join("");
+    }
+
+    //处理密钥内容
+    function keyValidate(str) {
+        str = str.replace(/\s|"|-/g, ""); //去空
+        str = str.toUpperCase(); //所有小写转成大写
+        str = str.replace(",", ""); //去逗号
+        var pattern = new RegExp("[`~!@#$^&*(-)=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？Z]", "g");
+        str = str.replace(pattern, ""); //去掉特殊字符及Z
+        var arr = str.split("");
+        var temp;
+        for (var i = 0; i < arr.length; i++)
+            for (var j = i + 1; j < arr.length; j++)
+                if (arr[i] === arr[j]) {
+                    arr.splice(j, 1);
+                    j--;
+                    temp = arr[i].charCodeAt();
+                    if (90 < temp || temp < 65)
+                        return "";
+                }
+        return arr.join("");
+
+    }
+
+    //找到位置
+    function find(str) {
+        var code = str.charCodeAt() - 65;
+        var arr = position[code].split(",");
+        return arr;
+
+    }
+
+    //加密
+    function lock(content, arr) { /*加密返回密文*/
+        var cLength = content.length;
+        var psw = "";
+        /*奇数*/
+        if (cLength % 2) {
+            content += "K";
+            cLength++;
+        } /*保证能配对*/
+        var result = "";
+        for (i = 0; i < cLength; i = i + 2) {
+            /*开始替换*/
+            var aArr = find(content[i]),
+                bArr = find(content[i + 1]);
+            var aX, aY, bX, bY, raX, raY, rbX, rbY;
+            aX = aArr[0] * 1;
+            aY = aArr[1] * 1;
+            bX = bArr[0] * 1;
+            bY = bArr[1] * 1;
+            if (aX == bX) { /*行相同*/
+                raY = aY == 4 ? 0 : (aY + 1);
+                rbY = bY == 4 ? 0 : (bY + 1);
+                result += arr[aX][raY] + arr[bX][rbY];
+            } else if (aY == bY) { /*列相同*/
+                raX = aX == 4 ? 0 : (aX + 1);
+                rbX = bX == 4 ? 0 : (bX + 1);
+                result += arr[raX][aY] + arr[rbX][bY];
+            } else { /*行列不同*/
+                raY = bY;
+                rbY = aY;
+                result += arr[aX][raY] + arr[bX][rbY];
+            }
+        }
+        return result;
+    }
+
+    //解密
+    function unlock(content, arr) {
+        var cLength = content.length;
+        /*奇数*/
+        var result = "";
+        for (i = 0; i < cLength; i = i + 2) {
+            /*开始替换*/
+            var aArr = find(content[i]),
+                bArr = find(content[i + 1]);
+            var aX, aY, bX, bY, raX, raY, rbX, rbY;
+            aX = aArr[0] * 1;
+            aY = aArr[1] * 1;
+            bX = bArr[0] * 1;
+            bY = bArr[1] * 1;
+            if (aX == bX) { /*行相同*/
+                raY = aY == 0 ? 4 : (aY - 1);
+                rbY = bY == 0 ? 4 : (bY - 1);
+                result += arr[aX][raY] + arr[bX][rbY];
+            } else if (aY == bY) { /*列相同*/
+                raX = aX == 0 ? 4 : (aX - 1);
+                rbX = bX == 0 ? 4 : (bX - 1);
+                result += arr[raX][aY] + arr[rbX][bY];
+            } else { /*行列不同*/
+                raY = bY;
+                rbY = aY;
+                result += arr[aX][raY] + arr[bX][rbY];
+            }
+        }
+        return result;
+    }
+
+    //点击加密按钮
+    encrypt.onclick = function() {
+        let content = Input.value
+        content = contentValidate(content)
+        let key = Key.value
+        key = keyValidate(key)
+        if (key.length == 0) {
+            alert("密匙含有不合法字符");
+            return;
+        }
+        if (content.length == 0) {
+            alert("明文含有不合法字符");
+            return;
+        }
+        //创建密码表
+        var keyArr = creat(key);
+        //加密
+        var result = lock(content, keyArr);
+        jiamiResult.value = result;
+    }
+
+    //点击解密按钮
+    decrypt.onclick = function() {
+        let content = jiamiResult.value
+        content = contentValidate(content)
+        let key = Key.value
+        key = keyValidate(key)
+        if (key.length == 0) {
+            alert("密匙含有不合法字符");
+            return;
+        }
+        if (content.length == 0) {
+            alert("明文含有不合法字符");
+            return;
+        }
+        //创建密码表
+        var keyArr = creat(key);
+        //加密
+        var result = unlock(content, keyArr).toLowerCase();
+        jiemiResult.value = result;
+    }
+</script>
+
+</html>
